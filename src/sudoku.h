@@ -1,14 +1,19 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define BOARD_SIZE 9
+
+
 
 struct Cell_impl
 {
     int row_index;
     int col_index;
     int box_index;
+    int board_index;
     int num_candidates;
     int candidates[BOARD_SIZE];
     int value; // solved or 0
@@ -16,6 +21,32 @@ struct Cell_impl
 };
 
 typedef struct Cell_impl Cell;
+
+#define PAIR(T1, T2) \
+    struct {          \
+        T1 first;      \
+        T2 second;     \
+    }
+
+typedef PAIR(int, int) IntPair;
+typedef PAIR(Cell*, Cell*) CellPair;
+
+#define TRIPLE(T1, T2, T3) \
+    struct {          \
+        T1 first;      \
+        T2 second;     \
+        T3 third;       \
+    }
+
+typedef TRIPLE(int, int, int) IntTriple;
+typedef TRIPLE(Cell*, Cell*, Cell*) CellTriple;
+
+int findMax(int a, int b);
+
+int findMin(int a, int b);
+
+int count_candidates(Cell *cell, int value, int *cnt_candidate, int *unique_candidate);
+
 
 struct SudokuBoard_impl
 {
@@ -42,6 +73,8 @@ void set_candidate(Cell *cell, int value);
 void unset_candidate(Cell *cell, int value);
 void set_candidates(Cell *cell, int *candidates, int size);
 int *get_candidates(Cell *cell);
+Cell *get_cell(SudokuBoard *p_board, int index);
+bool is_candidate(Cell *cell, int value);
 
 int check_solved_cells(SudokuBoard *p_board, Cell ***p_solved_cells);
 bool show_possible(SudokuBoard *p_board, Cell **p_solved_cells, int counter);

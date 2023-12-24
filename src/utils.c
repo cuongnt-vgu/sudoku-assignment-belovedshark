@@ -4,15 +4,31 @@
 
 #include "sudoku.h"
 
+int findMax(int a, int b) {
+    return a > b ? a : b;
+}
+
+int findMin(int a, int b) {
+    return a < b ? a : b;
+}
+
+int count_candidates(Cell *cell, int value, int *cnt_candidate, int *unique_candidate) {
+    if (is_candidate(cell, value)) {
+        cnt_candidate[value]++;
+        if (cnt_candidate[value] == 1) (*unique_candidate)++;
+    }
+    return 0;
+}
+
 void init_sudoku(SudokuBoard *p_board)
 {
-    p_board->data = malloc(BOARD_SIZE * sizeof(Cell *));
+    p_board->data = (Cell**) malloc(BOARD_SIZE * sizeof(Cell *));
     for (int i = 0; i < BOARD_SIZE; i++)
     {
-        p_board->data[i] = malloc(BOARD_SIZE * sizeof(Cell));
-        p_board->p_rows[i] = malloc(BOARD_SIZE * sizeof(Cell *));
-        p_board->p_cols[i] = malloc(BOARD_SIZE * sizeof(Cell *));
-        p_board->p_boxes[i] = malloc(BOARD_SIZE * sizeof(Cell *));
+        p_board->data[i] = (Cell*) malloc(BOARD_SIZE * sizeof(Cell));
+        p_board->p_rows[i] = (Cell**) malloc(BOARD_SIZE * sizeof(Cell *));
+        p_board->p_cols[i] = (Cell**) malloc(BOARD_SIZE * sizeof(Cell *));
+        p_board->p_boxes[i] = (Cell**) malloc(BOARD_SIZE * sizeof(Cell *));
     }
 
     // assign rows, cols, boxes constraint
@@ -29,6 +45,7 @@ void init_sudoku(SudokuBoard *p_board)
             p_board->data[i][j].row_index = i;
             p_board->data[i][j].col_index = j;
             p_board->data[i][j].box_index = (i / 3) * 3 + j / 3;
+            p_board->data[i][j].board_index = i * BOARD_SIZE + j;
         }
     }
 
@@ -108,7 +125,7 @@ void set_candidates(Cell *cell, int *candidates, int size)
 
 int *get_candidates(Cell *cell)
 {
-    int *out = malloc(cell->num_candidates * sizeof(int));
+    int *out = (int*) malloc(cell->num_candidates * sizeof(int));
     int counter = 0;
     for (int i = 0; i < BOARD_SIZE; i++)
     {
@@ -118,6 +135,10 @@ int *get_candidates(Cell *cell)
         }
     }
     return out;
+}
+
+Cell *get_cell(SudokuBoard *p_board, int index) {
+    return &p_board->data[index / BOARD_SIZE][index % BOARD_SIZE];
 }
 
 void load_sudoku(SudokuBoard *p_board, char *textData)
